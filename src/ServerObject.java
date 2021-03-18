@@ -16,4 +16,8 @@ public class ServerObject {
         this.memory = memory;
         this.disk = disk;
     }
+
+    public String toString(){
+        return type+", "+limit+", "+bootupTime+", "+hourlyRate+", "+coreCount+", "+memory+", "+disk;
+    }
 }
