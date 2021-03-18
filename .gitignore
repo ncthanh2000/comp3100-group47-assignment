@@ -21,3 +21,10 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+
+# Thanh's intellijIdea stuff
+.idea/
+out/
+comp3100-group47-assignment.iml
+
