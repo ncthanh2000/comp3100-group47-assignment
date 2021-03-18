@@ -42,8 +42,42 @@ public class Client {
 	public static void sendToServer(){
 
 	}
+
+	public static boolean checkArgs(String[] argument)
+	{
+		boolean flag = false;
+		if (argument == null || argument.length != 2) {
+			System.out.print("Invalid argument length");
+		}
+
+		else if (!argument[0].equals("-a"))
+		{
+			System.out.print("Missing argument: -a");
+		}
+
+
+		else if (!argument[1].equals("predefinedAlgo"))
+		// argument[1] has to be in the list of predefinedAlgo. We do something like predefinedAlgo.contains(argument[1])
+		{
+			System.out.print("For argument: -a, Invalid choice: " + (argument[1]));
+		}
+
+		else
+		{
+			System.out.print("Successful function call");
+			flag = true;
+		}
+		return flag;
+	}
+
+
     public static void main(String[] args) {
 		try {
+
+			// DO SOME ARGUMENT CHECKING
+			boolean validArg = checkArgs(args);
+
+
             String username=System.getProperty("user.name");
             String message = "AUTH " + username;
             Socket s = new Socket("localhost", 50000);
