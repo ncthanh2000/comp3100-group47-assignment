@@ -4,6 +4,9 @@ import java.util.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+
+import java.nio.charset.StandardCharsets;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -34,7 +37,7 @@ public class Client {
 	public ArrayList<ServerObject> readXML() {
 		ArrayList<ServerObject> serversList = new ArrayList<ServerObject>();
 		try {
-			File systemXML = new File("pre-compiled/ds-system.xml");
+			File systemXML = new File("./ds-system.xml");
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = dBuilder.parse(systemXML);
@@ -71,20 +74,50 @@ public class Client {
 			System.out.println(e);
 		}
 	}
+	public void readFromServer() {
+		try {
+			String serverMessage="";
+
+			// while(!input.ready()){}	
+			
+			while(input.ready()){
+				char c = (char) input.read();
+				// System.out.println(c);
+				serverMessage += c;
+
+ 			}
+			 System.out.println(serverMessage+"\n");
+
+		} catch (IOException e) {
+			System.out.println(e);
+		}
+	}
 	
 	//main method to do all the client handling
 	public void start() {
 		try {
 			String username = System.getProperty("user.name");
 			String authMessage = "AUTH " + username;
+			readFromServer();
+			System.out.println("Before Send\n");
 
 			sendToServer("HELO");
+			readFromServer(); //OK
+			System.out.println("After HELO\n");
+
 			sendToServer(authMessage);
-			sendToServer("REDY");
+			readFromServer();//OK
+			System.out.println("After AUTH\n");
 
+			//Reading XML from server
 			ArrayList<ServerObject> serverList=readXML();
+			// System.out.println(serverList.toString());
 
-			System.out.println(serverList.toString());
+			sendToServer("REDY");
+			readFromServer();
+			System.out.println("After REDY\n");
+
+			
 			
 			// sendToServer("REDY");
 
@@ -96,27 +129,25 @@ public class Client {
 
 	}
 
-	public boolean checkArgs(String[] argument) {
+	public static boolean checkArgs(String[] argument) {
 		boolean flag = false;
-		List validArgs = Arrays.asList("bf", "wf", "ff");
-
 		if (argument == null || argument.length != 2) {
-			System.out.println("Invalid argument length");
+			System.out.print("Invalid argument length");
 		}
 
 		else if (!argument[0].equals("-a")) {
-			System.out.println("Missing argument: -a");
+			System.out.print("Missing argument: -a");
 		}
 
-		else if (!validArgs.contains(argument[1]))
+		else if (!argument[1].equals("predefinedAlgo"))
 		// argument[1] has to be in the list of predefinedAlgo. We do something like
 		// predefinedAlgo.contains(argument[1])
 		{
-			System.out.println("For argument: -a, Invalid choice: " + (argument[1]));
+			System.out.print("For argument: -a, Invalid choice: " + (argument[1]));
 		}
 
 		else {
-			System.out.println("Successful function call");
+			System.out.print("Successful function call");
 			flag = true;
 		}
 		return flag;
@@ -124,7 +155,6 @@ public class Client {
 
 	public static void main(String[] args) {
 		Client client = new Client("127.0.0.1", 50000);
-		client.checkArgs(args);
 		// boolean validArg = checkArgs(args);
 		// DO SOME ARGUMENT CHECKING
 		client.start();
