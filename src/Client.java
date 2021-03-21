@@ -37,7 +37,7 @@ public class Client {
 	public ArrayList<ServerObject> readXML() {
 		ArrayList<ServerObject> serversList = new ArrayList<ServerObject>();
 		try {
-			File systemXML = new File("./ds-system.xml");
+			File systemXML = new File("pre-compiled/ds-system.xml");
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = dBuilder.parse(systemXML);
@@ -76,17 +76,20 @@ public class Client {
 	}
 	public void readFromServer() {
 		try {
-			String serverMessage="";
+			StringBuilder serverMessage= new StringBuilder();
 
 			// while(!input.ready()){}	
 			
 			while(input.ready()){
 				char c = (char) input.read();
 				// System.out.println(c);
-				serverMessage += c;
+				serverMessage.append(c);
+				if(c == '\n'){
+					break;
+				}
 
  			}
-			 System.out.println(serverMessage+"\n");
+			 System.out.println("server: "+serverMessage+"\n");
 
 		} catch (IOException e) {
 			System.out.println(e);
@@ -99,15 +102,15 @@ public class Client {
 			String username = System.getProperty("user.name");
 			String authMessage = "AUTH " + username;
 			readFromServer();
-			System.out.println("Before Send\n");
+			//System.out.println("Before Send\n");
 
 			sendToServer("HELO");
 			readFromServer(); //OK
-			System.out.println("After HELO\n");
+			//System.out.println("After HELO\n");
 
 			sendToServer(authMessage);
 			readFromServer();//OK
-			System.out.println("After AUTH\n");
+			//System.out.println("After AUTH\n");
 
 			//Reading XML from server
 			ArrayList<ServerObject> serverList=readXML();
@@ -115,7 +118,7 @@ public class Client {
 
 			sendToServer("REDY");
 			readFromServer();
-			System.out.println("After REDY\n");
+			//System.out.println("After REDY\n");
 
 			
 			
@@ -157,7 +160,7 @@ public class Client {
 
 	public static void main(String[] args) {
 		Client client = new Client("127.0.0.1", 50000);
-		 boolean validArg = checkArgs(args); // DO SOME ARGUMENT CHECKING
+		 boolean validArg = client.checkArgs(args); // DO SOME ARGUMENT CHECKING
 
 		client.start();
 		System.out.println("Hello world");
