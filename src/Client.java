@@ -34,7 +34,7 @@ public class Client {
 	public ArrayList<ServerObject> readXML() {
 		ArrayList<ServerObject> serversList = new ArrayList<ServerObject>();
 		try {
-			File systemXML = new File("./ds-system.xml");
+			File systemXML = new File("pre-compiled/ds-system.xml");
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = dBuilder.parse(systemXML);
@@ -96,25 +96,27 @@ public class Client {
 
 	}
 
-	public static boolean checkArgs(String[] argument) {
+	public boolean checkArgs(String[] argument) {
 		boolean flag = false;
+		List validArgs = Arrays.asList("bf", "wf", "ff");
+
 		if (argument == null || argument.length != 2) {
-			System.out.print("Invalid argument length");
+			System.out.println("Invalid argument length");
 		}
 
 		else if (!argument[0].equals("-a")) {
-			System.out.print("Missing argument: -a");
+			System.out.println("Missing argument: -a");
 		}
 
-		else if (!argument[1].equals("predefinedAlgo"))
+		else if (!validArgs.contains(argument[1]))
 		// argument[1] has to be in the list of predefinedAlgo. We do something like
 		// predefinedAlgo.contains(argument[1])
 		{
-			System.out.print("For argument: -a, Invalid choice: " + (argument[1]));
+			System.out.println("For argument: -a, Invalid choice: " + (argument[1]));
 		}
 
 		else {
-			System.out.print("Successful function call");
+			System.out.println("Successful function call");
 			flag = true;
 		}
 		return flag;
@@ -122,6 +124,7 @@ public class Client {
 
 	public static void main(String[] args) {
 		Client client = new Client("127.0.0.1", 50000);
+		client.checkArgs(args);
 		// boolean validArg = checkArgs(args);
 		// DO SOME ARGUMENT CHECKING
 		client.start();
