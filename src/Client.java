@@ -33,7 +33,7 @@ public class Client {
 
 	}
 
-	// function to read xml file server from the ds-server
+	// function to read xml file server in the ds-server
 	public ArrayList<ServerObject> readXML() {
 		ArrayList<ServerObject> serversList = new ArrayList<ServerObject>();
 		try {
