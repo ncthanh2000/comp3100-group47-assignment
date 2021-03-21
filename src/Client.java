@@ -129,29 +129,31 @@ public class Client {
 
 	}
 
-	public static boolean checkArgs(String[] argument) {
-		boolean flag = false;
-		if (argument == null || argument.length != 2) {
-			System.out.println("Invalid argument length");
-		}
+	public boolean checkArgs(String[] argument) {
+        boolean flag = false;
+        List validArgs = Arrays.asList("bf", "wf", "ff");
 
-		else if (!argument[0].equals("-a")) {
-			System.out.println("Missing argument: -a");
-		}
+        if (argument == null || argument.length != 2) {
+            System.out.println("Invalid argument length");
+        }
 
-		else if (!argument[1].equals("predefinedAlgo"))
-		// argument[1] has to be in the list of predefinedAlgo. We do something like
-		// predefinedAlgo.contains(argument[1])
-		{
-			System.out.println("For argument: -a, Invalid choice: " + (argument[1]));
-		}
+        else if (!argument[0].equals("-a")) {
+            System.out.println("Missing argument: -a");
+        }
 
-		else {
-			System.out.println("Successful function call");
-			flag = true;
-		}
-		return flag;
-	}
+        else if (!validArgs.contains(argument[1]))
+        // argument[1] has to be in the list of predefinedAlgo. We do something like
+        // predefinedAlgo.contains(argument[1])
+        {
+            System.out.println("For argument: -a, Invalid choice: " + (argument[1]));
+        }
+
+        else {
+            System.out.println("Successful function call");
+            flag = true;
+        }
+        return flag;
+    }
 
 	public static void main(String[] args) {
 		Client client = new Client("127.0.0.1", 50000);
