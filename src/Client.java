@@ -4,7 +4,6 @@ import java.util.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-
 import java.nio.charset.StandardCharsets;
 
 import org.w3c.dom.Document;
@@ -18,6 +17,8 @@ public class Client {
 	public DataOutputStream output = null;
 	public ArrayList<ServerObject> servers = null;
 	public ServerObject largestServerObject = null;
+	public String serverMessage = null;
+	public String latestMessage = null;
 
 	public Client(String localAddress, int port) {
 
@@ -69,48 +70,51 @@ public class Client {
 	// method to send to the server
 	public void sendToServer(String message) {
 		try {
-			output.write((message+"\n").getBytes());
+			output.write((message + "\n").getBytes());
 			output.flush();
 		} catch (IOException e) {
 			System.out.println(e);
 		}
 	}
-	public void readFromServer() {
+
+	public String readFromServer() {
 		try {
-			 String serverMessage = input.readLine();
-			 System.out.println("server: "+serverMessage+"\n");
+			serverMessage = input.readLine();
+			System.out.println("server: " + serverMessage + "\n");
 		} catch (IOException e) {
 			System.out.println(e);
 		}
+		return serverMessage;
 	}
-	
-	//main method to do all the client handling
+
+	// main method to do all the client handling
 	public void start(String[] args) {
 		try {
-			//sendToServer("");
+			sendToServer("");
 			String username = System.getProperty("user.name");
 			String authMessage = "AUTH " + username;
 			readFromServer();
-			//System.out.println("Before Send\n");
 
 			sendToServer("HELO");
-			readFromServer(); //OK
-			//System.out.println("After HELO\n");
+			readFromServer(); // OK
 
 			sendToServer(authMessage);
-			readFromServer();//OK
-			//System.out.println("After AUTH\n");
+			readFromServer();// OK
 
-			//Reading XML from server, get largest server, set to client's instance variables
+			// Reading XML from server, get largest server, set to client's instance
+			// variables
 			this.initialiseServer(args);
 
-
 			sendToServer("REDY");
-			readFromServer();
-			//System.out.println("After REDY\n");
+			latestMessage = readFromServer();
+			String[] splitedJob = latestMessage.split("\\s+");
+			for (String i : splitedJob) {
+				System.out.println(i);
+			}
+			Jobs jobs = new Jobs(Integer.parseInt(splitedJob[0]), Integer.parseInt(splitedJob[1]),Integer.parseInt(splitedJob[2]), Integer.parseInt(splitedJob[3]), Integer.parseInt(splitedJob[4]),Integer.parseInt(splitedJob[5]));
+			// System.out.println(splited);
+			// Receiving Largest Server
 
-			
-			
 			// sendToServer("REDY");
 
 			s.close();
@@ -121,21 +125,17 @@ public class Client {
 
 	}
 
-	public void initialiseServer(String[] args)
-	{
+	public void initialiseServer(String[] args) {
 		this.servers = readXML();
 		System.out.println(this.servers);
 		this.largestServerObject = getLargestServer(this.servers);
 		boolean validArg = this.checkArgs(args); // DO SOME ARGUMENT CHECKING
 	}
 
-	public ServerObject getLargestServer(ArrayList<ServerObject>servers)
-	{
+	public ServerObject getLargestServer(ArrayList<ServerObject> servers) {
 		ServerObject max = servers.get(0);
-		for(ServerObject s:servers)
-		{
-			if(max.compareTo(s) < 0)
-			{
+		for (ServerObject s : servers) {
+			if (max.compareTo(s) < 0) {
 				max = s;
 			}
 		}
@@ -143,30 +143,30 @@ public class Client {
 	}
 
 	public boolean checkArgs(String[] argument) {
-        boolean flag = false;
-        List validArgs = Arrays.asList("bf", "wf", "ff");
+		boolean flag = false;
+		List validArgs = Arrays.asList("bf", "wf", "ff");
 
-        if (argument == null || argument.length != 2) {
-            System.out.println("Invalid argument length");
-        }
+		if (argument == null || argument.length != 2) {
+			System.out.println("Invalid argument length");
+		}
 
-        else if (!argument[0].equals("-a")) {
-            System.out.println("Missing argument: -a");
-        }
+		else if (!argument[0].equals("-a")) {
+			System.out.println("Missing argument: -a");
+		}
 
-        else if (!validArgs.contains(argument[1]))
-        // argument[1] has to be in the list of predefinedAlgo. We do something like
-        // predefinedAlgo.contains(argument[1])
-        {
-            System.out.println("For argument: -a, Invalid choice: " + (argument[1]));
-        }
+		else if (!validArgs.contains(argument[1]))
+		// argument[1] has to be in the list of predefinedAlgo. We do something like
+		// predefinedAlgo.contains(argument[1])
+		{
+			System.out.println("For argument: -a, Invalid choice: " + (argument[1]));
+		}
 
-        else {
-            System.out.println("Successful function call");
-            flag = true;
-        }
-        return flag;
-    }
+		else {
+			System.out.println("Successful function call");
+			flag = true;
+		}
+		return flag;
+	}
 
 	public static void main(String[] args) {
 		Client client = new Client("127.0.0.1", 50000);
