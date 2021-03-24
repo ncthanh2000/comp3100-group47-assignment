@@ -16,11 +16,13 @@ public class Client {
 	public Socket s = null;
 	public BufferedReader input = null;
 	public DataOutputStream output = null;
+	public ArrayList<ServerObject> servers = null;
+	public ServerObject largestServerObject = null;
 
 	public Client(String localAddress, int port) {
 
 		try {
-			s = new Socket("localhost", 50000);
+			s = new Socket(localAddress, port);
 			input = new BufferedReader(new InputStreamReader(s.getInputStream()));
 			output = new DataOutputStream(s.getOutputStream());
 		} catch (UnknownHostException e) {
@@ -83,7 +85,7 @@ public class Client {
 	}
 	
 	//main method to do all the client handling
-	public void start() {
+	public void start(String[] args) {
 		try {
 			//sendToServer("");
 			String username = System.getProperty("user.name");
@@ -91,7 +93,7 @@ public class Client {
 			readFromServer();
 			//System.out.println("Before Send\n");
 
-			sendToServer("\n"+"HELO");
+			sendToServer("HELO");
 			readFromServer(); //OK
 			//System.out.println("After HELO\n");
 
@@ -99,9 +101,9 @@ public class Client {
 			readFromServer();//OK
 			//System.out.println("After AUTH\n");
 
-			//Reading XML from server
-			ArrayList<ServerObject> serverList=readXML();
-			// System.out.println(serverList.toString());
+			//Reading XML from server, get largest server, set to client's instance variables
+			this.initialiseServer(args);
+
 
 			sendToServer("REDY");
 			readFromServer();
@@ -117,6 +119,14 @@ public class Client {
 			e.printStackTrace();
 		}
 
+	}
+
+	public void initialiseServer(String[] args)
+	{
+		this.servers = readXML();
+		System.out.println(this.servers);
+		this.largestServerObject = getLargestServer(this.servers);
+		boolean validArg = this.checkArgs(args); // DO SOME ARGUMENT CHECKING
 	}
 
 	public ServerObject getLargestServer(ArrayList<ServerObject>servers)
@@ -160,9 +170,9 @@ public class Client {
 
 	public static void main(String[] args) {
 		Client client = new Client("127.0.0.1", 50000);
-		 boolean validArg = client.checkArgs(args); // DO SOME ARGUMENT CHECKING
+		client.start(args);
+		System.out.println(client.largestServerObject);
 
-		client.start();
 		System.out.println("Hello world");
 
 	}
