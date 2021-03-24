@@ -67,30 +67,16 @@ public class Client {
 	// method to send to the server
 	public void sendToServer(String message) {
 		try {
-			output.write(message.getBytes());
+			output.write((message+"\n").getBytes());
 			output.flush();
-
 		} catch (IOException e) {
 			System.out.println(e);
 		}
 	}
 	public void readFromServer() {
 		try {
-			StringBuilder serverMessage= new StringBuilder();
-
-			// while(!input.ready()){}	
-			
-			while(input.ready()){
-				char c = (char) input.read();
-				// System.out.println(c);
-				serverMessage.append(c);
-				if(c == '\n'){
-					break;
-				}
-
- 			}
+			 String serverMessage = input.readLine();
 			 System.out.println("server: "+serverMessage+"\n");
-
 		} catch (IOException e) {
 			System.out.println(e);
 		}
@@ -99,12 +85,13 @@ public class Client {
 	//main method to do all the client handling
 	public void start() {
 		try {
+			//sendToServer("");
 			String username = System.getProperty("user.name");
 			String authMessage = "AUTH " + username;
 			readFromServer();
 			//System.out.println("Before Send\n");
 
-			sendToServer("HELO");
+			sendToServer("\n"+"HELO");
 			readFromServer(); //OK
 			//System.out.println("After HELO\n");
 
@@ -130,6 +117,19 @@ public class Client {
 			e.printStackTrace();
 		}
 
+	}
+
+	public ServerObject getLargestServer(ArrayList<ServerObject>servers)
+	{
+		ServerObject max = servers.get(0);
+		for(ServerObject s:servers)
+		{
+			if(max.compareTo(s) < 0)
+			{
+				max = s;
+			}
+		}
+		return new ServerObject(max);
 	}
 
 	public boolean checkArgs(String[] argument) {
