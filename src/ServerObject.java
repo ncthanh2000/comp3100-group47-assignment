@@ -37,25 +37,11 @@ public class ServerObject {
 
 	public int compareTo(ServerObject other)
     {
-        // Comparison ordering: type -> coreCount -> memory -> disk
-        List<String> typeCompare = Arrays.asList("tiny", "small","medium","large", "xlarge");
-        // using typeCompare.indexOf to compare since we know that there's a
-        // fixed number of "types"
-        int typeComp  = 0;
-        if(typeCompare.indexOf(this.type) < typeCompare.indexOf(other.type))
-        {
-            typeComp = -1;
-        }
-
-        if(typeCompare.indexOf(this.type) > typeCompare.indexOf(other.type))
-        {
-            typeComp = 1;
-        }
-
+        // Comparison ordering: coreCount -> memory -> disk
         int coreComp = Integer.compare(this.coreCount, other.coreCount);
         int memoryComp = Integer.compare(this.memory, other.memory);
         int diskComp = Integer.compare(this.disk, other.disk);
 
-        return typeComp!=0?typeComp: coreComp!=0?coreComp: memoryComp!=0?memoryComp: diskComp;
+        return coreComp!=0?coreComp: memoryComp!=0?memoryComp: diskComp;
     }
 }
