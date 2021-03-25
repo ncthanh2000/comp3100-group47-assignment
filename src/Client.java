@@ -18,7 +18,7 @@ public class Client {
 	public ArrayList<ServerObject> servers = null;
 	public ServerObject largestServerObject = null;
 	public String serverMessage = null;
-	public String latestMessage = null;
+	public String clientMessage = null; // why is this needed?
 
 	public Client(String localAddress, int port) {
 
@@ -77,41 +77,39 @@ public class Client {
 		}
 	}
 
-	public String readFromServer() {
+	public void readFromServer() {
 		try {
+			//refactor so that this.serverMessage is assigned from input.readLine
 			serverMessage = input.readLine();
 			System.out.println("server: " + serverMessage + "\n");
 		} catch (IOException e) {
+			serverMessage = "Error";
 			System.out.println(e);
 		}
-		return serverMessage;
 	}
 
 	// main method to do all the client handling
 	public void start(String[] args) {
 		try {
-			sendToServer("");
-			String username = System.getProperty("user.name");
-			String authMessage = "AUTH " + username;
-			readFromServer();
-
 			sendToServer("HELO");
 			readFromServer(); // OK
 
+			String username = System.getProperty("user.name");
+			String authMessage = "AUTH " + username;
 			sendToServer(authMessage);
 			readFromServer();// OK
 
-			// Reading XML from server, get largest server, set to client's instance
-			// variables
+			// Reading XML from server, get largest server, set to client's instance variables
 			this.initialiseServer(args);
 
 			sendToServer("REDY");
-			latestMessage = readFromServer();
-			String[] splitedJob = latestMessage.split("\\s+");
-			for (String i : splitedJob) {
-				System.out.println(i);
-			}
-			Jobs jobs = new Jobs(Integer.parseInt(splitedJob[0]), Integer.parseInt(splitedJob[1]),Integer.parseInt(splitedJob[2]), Integer.parseInt(splitedJob[3]), Integer.parseInt(splitedJob[4]),Integer.parseInt(splitedJob[5]));
+			readFromServer();
+
+//			String[] splitedJob = serverMessage.split("\\s+");
+//			for (String i : splitedJob) {
+//				System.out.println(i);
+//			}
+//			Jobs jobs = new Jobs(Integer.parseInt(splitedJob[0]), Integer.parseInt(splitedJob[1]),Integer.parseInt(splitedJob[2]), Integer.parseInt(splitedJob[3]), Integer.parseInt(splitedJob[4]),Integer.parseInt(splitedJob[5]));
 			// System.out.println(splited);
 			// Receiving Largest Server
 
