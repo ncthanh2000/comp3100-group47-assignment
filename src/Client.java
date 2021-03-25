@@ -19,7 +19,7 @@ public class Client {
 	public ServerObject largestServerObject = null;
 	public String serverMessage = null;
 	public String clientMessage = null; // why is this needed?
-
+	public Boolean receivedNone = null;
 	public Client(String localAddress, int port) {
 
 		try {
@@ -81,6 +81,7 @@ public class Client {
 		try {
 			//refactor so that this.serverMessage is assigned from input.readLine
 			serverMessage = input.readLine();
+			receivedNone = serverMessage.equals("NONE");
 			System.out.println("server: " + serverMessage + "\n");
 		} catch (IOException e) {
 			serverMessage = "Error";
@@ -89,21 +90,101 @@ public class Client {
 	}
 
 	// main method to do all the client handling
+
+	public void handShake()
+	{
+		sendToServer("HELO");
+		readFromServer(); // OK
+
+		String username = System.getProperty("user.name");
+		String authMessage = "AUTH " + username;
+		sendToServer(authMessage);
+		readFromServer();// OK
+
+		this.receivedNone = false;
+	}
+
+	public void quit() throws IOException {
+		sendToServer("QUIT");
+		readFromServer();
+		if(serverMessage.equals("QUIT"))
+		{
+			input.close(); output.close(); s.close();
+		}
+	}
+
+
 	public void start(String[] args) {
 		try {
-			sendToServer("HELO");
-			readFromServer(); // OK
-
-			String username = System.getProperty("user.name");
-			String authMessage = "AUTH " + username;
-			sendToServer(authMessage);
-			readFromServer();// OK
-
+			handShake();
 			// Reading XML from server, get largest server, set to client's instance variables
 			this.initialiseServer(args);
 
 			sendToServer("REDY");
 			readFromServer();
+
+
+			String[] serverMessageArray = serverMessage.split(" ");
+
+			Job j = null;
+
+			if(serverMessageArray[0].equals("JOBN"))
+			{
+				j = new Job(serverMessageArray);
+				sendToServer("GETS Capable "+j.GET());
+			}
+			readFromServer(); // DATA n
+			int numLines = Integer.parseInt(serverMessage.split(" ")[1]);
+
+
+			sendToServer("OK");
+			ArrayList<String> serverStatuses = readMultiLineFromServer(numLines); // this will contain info of all server statuses //need to have a specific read because of multiline
+
+
+			sendToServer("OK");
+			readFromServer(); // .
+
+			//this is where we should send schedule
+			assert serverStatuses != null;
+			String serverToScheduleJob = getFirstLargestServerObject(serverStatuses);
+			sendToServer("SCHD "+j.jobId+" "+serverToScheduleJob);
+			readFromServer();
+
+
+//			//step 4 is done here.
+//			while(!receivedNone)
+//			{
+//				//step 5
+//				sendToServer("REDY");
+//
+//				//step 6
+//				readFromServer(); //might get JOBN, JOBP, ... NONE
+//
+//
+//				String[] serverMessageArray = serverMessage.split(" ");
+//				switch (serverMessageArray[0]){
+//					case "JOBN":{ //array.length is guaranteed to be 7
+//						sendToServer("GETS Capable "+serverMessageArray[4]
+//								+" "+serverMessageArray[5] +" "+serverMessageArray[6]);
+//					}
+//					case "JOBP":{
+//
+//					}
+//
+//					case "DATA":{
+//						sendToServer("OK");
+//					}
+//					default:
+//						break;
+//				}
+//			}
+
+			// this line is reached when NONE has been received
+			//quit();
+
+
+
+
 
 //			String[] splitedJob = serverMessage.split("\\s+");
 //			for (String i : splitedJob) {
@@ -123,14 +204,31 @@ public class Client {
 
 	}
 
+	private ArrayList<String> readMultiLineFromServer(int numLines) {
+		try {
+			ArrayList<String> lines = new ArrayList<String>();
+			for(int i = 0; i < numLines; i++)
+			{
+				serverMessage = input.readLine();
+				lines.add(serverMessage);
+				receivedNone = serverMessage.equals("NONE");
+			}
+			System.out.println(lines.toString());
+			return lines;
+		} catch (IOException e) {
+			serverMessage = "Error";
+			System.out.println(e);
+			return null;
+		}
+	}
+
 	public void initialiseServer(String[] args) {
 		this.servers = readXML();
-		System.out.println(this.servers);
-		this.largestServerObject = getLargestServer(this.servers);
+		this.largestServerObject = getLargestServer();
 		boolean validArg = this.checkArgs(args); // DO SOME ARGUMENT CHECKING
 	}
 
-	public ServerObject getLargestServer(ArrayList<ServerObject> servers) {
+	public ServerObject getLargestServer() {
 		ServerObject max = servers.get(0);
 		for (ServerObject s : servers) {
 			if (max.compareTo(s) < 0) {
@@ -138,6 +236,27 @@ public class Client {
 			}
 		}
 		return new ServerObject(max);
+	}
+
+	public String getFirstLargestServerObject(ArrayList<String> serverStatuses){
+		// assuming the arraylist servers have been initialised
+		//serverState is sent as 1 message in page 15 of ds-sim-user-guide
+
+		//note that, while there might be unavailable servers, the client does not have to handle
+		// "scheduling to only available/booting.." servers.
+		// in later implementations, we could improve on this
+
+		String largestType = getLargestServer().type;
+		int id = 0;
+		for(String s: serverStatuses)
+		{
+			String[] splitted = s.split(" ");
+			if(splitted[0].equals(largestType))
+			{
+				id = Math.min(Integer.parseInt(splitted[1]), id);
+			}
+		}
+		return largestType+" "+id; //something like "super-silk 0"
 	}
 
 	public boolean checkArgs(String[] argument) {
@@ -160,7 +279,7 @@ public class Client {
 		}
 
 		else {
-			System.out.println("Successful function call");
+			System.out.println("Successful client call");
 			flag = true;
 		}
 		return flag;
@@ -169,9 +288,6 @@ public class Client {
 	public static void main(String[] args) {
 		Client client = new Client("127.0.0.1", 50000);
 		client.start(args);
-		System.out.println(client.largestServerObject);
-
 		System.out.println("Hello world");
-
 	}
 }
