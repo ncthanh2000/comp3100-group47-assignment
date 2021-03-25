@@ -120,8 +120,8 @@ public class Client {
 			// Reading XML from server, get largest server, set to client's instance variables
 			this.initialiseServer(args);
 
-			sendToServer("REDY");
-			readFromServer();
+			sendToServer("REDY"); // step 5
+			readFromServer(); // step 6
 
 
 			String[] serverMessageArray = serverMessage.split(" ");
@@ -131,14 +131,15 @@ public class Client {
 			if(serverMessageArray[0].equals("JOBN"))
 			{
 				j = new Job(serverMessageArray);
-				sendToServer("GETS Capable "+j.GET());
+				sendToServer("GETS Capable "+j.GET()); // step 7
 			}
-			readFromServer(); // DATA n
+			readFromServer(); // DATA n // step 8
 			int numLines = Integer.parseInt(serverMessage.split(" ")[1]);
 
 
 			sendToServer("OK");
-			ArrayList<String> serverStatuses = readMultiLineFromServer(numLines); // this will contain info of all server statuses //need to have a specific read because of multiline
+			ArrayList<String> serverStatuses = readMultiLineFromServer(numLines);
+			// this will contain info of all server statuses //need to have a specific read because of multiline
 
 
 			sendToServer("OK");
@@ -148,7 +149,9 @@ public class Client {
 			assert serverStatuses != null;
 			String serverToScheduleJob = getFirstLargestServerObject(serverStatuses);
 			sendToServer("SCHD "+j.jobId+" "+serverToScheduleJob);
-			readFromServer();
+			readFromServer(); // OK
+
+			// next is to send RDY again
 
 
 //			//step 4 is done here.
