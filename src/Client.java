@@ -180,23 +180,7 @@ public class Client {
 //			}
 
 			// this line is reached when NONE has been received
-			//quit();
-
-
-
-
-
-//			String[] splitedJob = serverMessage.split("\\s+");
-//			for (String i : splitedJob) {
-//				System.out.println(i);
-//			}
-//			Jobs jobs = new Jobs(Integer.parseInt(splitedJob[0]), Integer.parseInt(splitedJob[1]),Integer.parseInt(splitedJob[2]), Integer.parseInt(splitedJob[3]), Integer.parseInt(splitedJob[4]),Integer.parseInt(splitedJob[5]));
-			// System.out.println(splited);
-			// Receiving Largest Server
-
-			// sendToServer("REDY");
-
-			s.close();
+			quit();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
