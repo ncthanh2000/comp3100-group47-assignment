@@ -26,6 +26,6 @@ public class Job {
 
     public String GET()
     {
-        return this.core+" "+this.memory+" "+this.disk;
+        return core+" "+memory+" "+disk;
     }
 }

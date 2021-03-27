@@ -3,6 +3,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ServerObject {
+    int id;
+
     String type;
     int limit;
     int bootupTime;
@@ -10,6 +12,8 @@ public class ServerObject {
     int coreCount;
     int memory;
     int disk;
+    String serverState;
+    int curStartTime;
 
     public ServerObject(String type, int limit, int bootupTime, double hourlyRate, int coreCount, int memory, int disk) {
         this.type = type;
@@ -19,6 +23,17 @@ public class ServerObject {
         this.coreCount = coreCount;
         this.memory = memory;
         this.disk = disk;
+    }
+
+    //this object is for storing the lastest state of the server
+    public ServerObject(String type, String id, String serverState, String curStartTime, String coreCount, String memory, String disk) {
+        this.type = type;
+        this.id = Integer.parseInt(id);
+        this.serverState = serverState;
+        this.curStartTime = Integer.parseInt(curStartTime);
+        this.coreCount = Integer.parseInt(coreCount);
+        this.memory = Integer.parseInt(memory);
+        this.disk = Integer.parseInt(disk);
     }
 
     public String toString(){
