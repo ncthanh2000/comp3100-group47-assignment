@@ -322,7 +322,12 @@ public class Client {
 		boolean flag = false;
 		List validArgs = Arrays.asList("bf", "wf", "ff");
 
-		if (argument == null || argument.length != 2) {
+		if(argument.length == 0)
+		{
+			System.out.println("Running without arguments");
+		}
+
+		else if (argument.length == 1 ){
 			System.out.println("Invalid argument length");
 		}
 
@@ -331,8 +336,6 @@ public class Client {
 		}
 
 		else if (!validArgs.contains(argument[1]))
-		// argument[1] has to be in the list of predefinedAlgo. We do something like
-		// predefinedAlgo.contains(argument[1])
 		{
 			System.out.println("For argument: -a, Invalid choice: " + (argument[1]));
 		}
