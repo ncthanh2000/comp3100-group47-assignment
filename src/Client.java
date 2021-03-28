@@ -124,7 +124,7 @@ public class Client {
 
 			sendToServer("REDY"); // step 5
 			readFromServer(); // step 6
-
+			System.out.println(serverMessage);
 			// start implementation
 
 			// add if receive none quit immediatly
@@ -132,55 +132,52 @@ public class Client {
 				quit();
 			} else {
 				while (!receivedNone) {
+					System.out.println("inside loop");
+
+					String[] serverMessageArray = serverMessage.split(" ");
+					
+					
 
 					if (serverMessage.equals("OK")) {
 						sendToServer("REDY");
 						readFromServer();
 					}
+
 					if (serverMessage.equals("NONE")) {
 						receivedNone = true;
 					}
 					// read from server to create job for the client to schedule
-					// readFromServer();
+
+					System.out.println("Inside Loop server message: " + serverMessage);
+					
 					// JOBN
-					String[] serverMessageArray = serverMessage.split("\\s+");
+					serverMessageArray = serverMessage.split(" ");
+					System.out.println("The first Server message"+serverMessageArray[0]);
+					if(serverMessageArray[0].equals("JCPL")){
+						sendToServer("REDY");
+						readFromServer();//JOBN
+						serverMessageArray = serverMessage.split(" ");
+					}
+
 					Job j = new Job(serverMessageArray);
 					System.out.println(j.GET() + "Job Requirement");
 
 					sendToServer("GETS Avail " + j.GET());
-					// send ok after geting DATA from server
+
+					readFromServer();// DATA
+					int numLines = Integer.parseInt(serverMessage.split(" ")[1]);
 					sendToServer("OK");
+					ArrayList<String> serverStatuses = readMultiLineFromServer(numLines); // this
+					sendToServer("OK");
+					readFromServer(); // .
 
-					// read from server again to check for "." that is when server finish sending
-					// available server
+					assert serverStatuses != null;
+					String serverToScheduleJob = getFirstLargestServerObject(serverStatuses);
+					sendToServer("SCHD " + j.jobId + " " + serverToScheduleJob);
 					readFromServer();
-					readFromServer();
-					// this read will receive all the status of the servers
-
-					// adding server that avaible to do the job to a new ArrayList of server
-					ArrayList<ServerObject> serversAfterGets = new ArrayList<ServerObject>();
-
-					while (!serverMessage.equals(".")) {
-
-						String[] availableServer = serverMessage.split("\\s+");
-						System.out.println("Inside ." + availableServer);
-						serversAfterGets.add(new ServerObject(availableServer[0], availableServer[1],
-								availableServer[2], availableServer[3], availableServer[4], availableServer[5],
-								availableServer[6]));
-						sendToServer("OK");
-						readFromServer();
-
-					}
-
-					sendToServer(
-							"SCHD " + j.jobId + " " + serversAfterGets.get(0).type + " " + serversAfterGets.get(0).id);
-
-					System.out.println("after gets");
-					System.out.println(serversAfterGets.toString());
-
-					quit();
 
 				}
+				quit();
 			}
 			// end implementation
 
