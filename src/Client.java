@@ -124,8 +124,7 @@ public class Client {
 
 			sendToServer("REDY"); // step 5
 			readFromServer(); // step 6
-			System.out.println(serverMessage);
-			// start implementation
+
 
 			// add if receive none quit immediatly
 			if (serverMessage.equals("NONE")) {
@@ -135,47 +134,54 @@ public class Client {
 					System.out.println("inside loop");
 
 					String[] serverMessageArray = serverMessage.split(" ");
-					
-					
+					switch (serverMessageArray[0]) {
+						case "NONE": {
+							break;
+						}
 
-					if (serverMessage.equals("OK")) {
-						sendToServer("REDY");
-						readFromServer();
+						case "JOBN": {
+							Job j = new Job(serverMessageArray);
+							sendToServer("GETS Avail " + j.GET());
+							readFromServer();// DATA
+							int numLines = Integer.parseInt(serverMessage.split(" ")[1]);
+							sendToServer("OK");
+							ArrayList<String> serverStatuses = readMultiLineFromServer(numLines); // multiple server states
+							sendToServer("OK");
+							readFromServer(); // .
+
+							assert serverStatuses != null;
+							String serverToScheduleJob = getFirstLargestServerObject(serverStatuses);
+							sendToServer("SCHD " + j.jobId + " " + serverToScheduleJob);
+							readFromServer();
+						}
+
+						case "JOBP": {
+							Job j = new Job(serverMessageArray);
+							sendToServer("GETS Avail " + j.GET());
+							readFromServer();// DATA
+							int numLines = Integer.parseInt(serverMessage.split(" ")[1]);
+							sendToServer("OK");
+							ArrayList<String> serverStatuses = readMultiLineFromServer(numLines); // this
+							sendToServer("OK");
+							readFromServer(); // .
+
+							assert serverStatuses != null;
+							String serverToScheduleJob = getFirstLargestServerObject(serverStatuses);
+							sendToServer("SCHD " + j.jobId + " " + serverToScheduleJob);
+							readFromServer();
+						}
+
+						case "JCPL": {
+							sendToServer("REDY");
+							readFromServer();
+						}
+
+						case "OK": {
+							sendToServer("REDY");
+							readFromServer();
+						}
+						default:
 					}
-
-					if (serverMessage.equals("NONE")) {
-						receivedNone = true;
-					}
-					// read from server to create job for the client to schedule
-
-					System.out.println("Inside Loop server message: " + serverMessage);
-					
-					// JOBN
-					serverMessageArray = serverMessage.split(" ");
-					System.out.println("The first Server message"+serverMessageArray[0]);
-					if(serverMessageArray[0].equals("JCPL")){
-						sendToServer("REDY");
-						readFromServer();//JOBN
-						serverMessageArray = serverMessage.split(" ");
-					}
-
-					Job j = new Job(serverMessageArray);
-					System.out.println(j.GET() + "Job Requirement");
-
-					sendToServer("GETS Avail " + j.GET());
-
-					readFromServer();// DATA
-					int numLines = Integer.parseInt(serverMessage.split(" ")[1]);
-					sendToServer("OK");
-					ArrayList<String> serverStatuses = readMultiLineFromServer(numLines); // this
-					sendToServer("OK");
-					readFromServer(); // .
-
-					assert serverStatuses != null;
-					String serverToScheduleJob = getFirstLargestServerObject(serverStatuses);
-					sendToServer("SCHD " + j.jobId + " " + serverToScheduleJob);
-					readFromServer();
-
 				}
 				quit();
 			}
