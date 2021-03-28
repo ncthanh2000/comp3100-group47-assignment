@@ -123,17 +123,18 @@ public class Client {
 			this.initialiseServer(args);
 
 			sendToServer("REDY"); // step 5
-			readFromServer(); // step 6
+			// readFromServer(); // step 6
 
 
 			// add if receive none quit immediatly
 			if (serverMessage.equals("NONE")) {
 				quit();
 			} else {
+				String[] serverMessageArray = null;
 				while (!receivedNone) {
 					System.out.println("inside loop");
-
-					String[] serverMessageArray = serverMessage.split(" ");
+					readFromServer();
+					serverMessageArray = serverMessage.split(" ");
 					switch (serverMessageArray[0]) {
 						case "NONE": {
 							break;
@@ -152,9 +153,10 @@ public class Client {
 							assert serverStatuses != null;
 							String serverToScheduleJob = getFirstLargestServerObject(serverStatuses);
 							sendToServer("SCHD " + j.jobId + " " + serverToScheduleJob);
-							readFromServer();
+							readFromServer(); //OK
+							sendToServer("REDY");
 						}
-
+/*
 						case "JOBP": {
 							Job j = new Job(serverMessageArray);
 							sendToServer("GETS Avail " + j.GET());
@@ -168,7 +170,8 @@ public class Client {
 							assert serverStatuses != null;
 							String serverToScheduleJob = getFirstLargestServerObject(serverStatuses);
 							sendToServer("SCHD " + j.jobId + " " + serverToScheduleJob);
-							readFromServer();
+							readFromServer(); //OK
+							sendToServer("REDY");
 						}
 
 						case "JCPL": {
@@ -180,6 +183,8 @@ public class Client {
 							sendToServer("REDY");
 							readFromServer();
 						}
+
+ */
 						default:
 					}
 				}
@@ -273,7 +278,7 @@ public class Client {
 				lines.add(serverMessage);
 				receivedNone = serverMessage.equals("NONE");
 			}
-			System.out.println(lines.toString());
+			System.out.println("server: "+lines.toString()+"\n");
 			return lines;
 		} catch (IOException e) {
 			serverMessage = "Error";
