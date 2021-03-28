@@ -4,7 +4,6 @@ import java.util.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import java.nio.charset.StandardCharsets;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -118,29 +117,20 @@ public class Client {
 	public void start(String[] args) {
 		try {
 			handShake();
-			// Reading XML from server, get largest server, set to client's instance
-			// variables
+			// Reading XML from server, get largest server, set to client's instance variables
 			this.initialiseServer(args);
 
 			sendToServer("REDY"); // step 5
-			// readFromServer(); // step 6
 
-
-			// add if receive none quit immediatly
-			if (serverMessage.equals("NONE")) {
-				quit();
-			} else {
 				String[] serverMessageArray = null;
+				int loopIter = 0;
 				while (!receivedNone) {
-					System.out.println("inside loop");
+					System.out.println("inside loop: " + loopIter++);
 					readFromServer();
 					serverMessageArray = serverMessage.split(" ");
 					switch (serverMessageArray[0]) {
-						case "NONE": {
-							break;
-						}
-
-						case "JOBN": {
+						case ("JOBN"): // merge with case JOBP
+						case "JOBP": {
 							Job j = new Job(serverMessageArray);
 							sendToServer("GETS Avail " + j.GET());
 							readFromServer();// DATA
@@ -153,116 +143,22 @@ public class Client {
 							assert serverStatuses != null;
 							String serverToScheduleJob = getFirstLargestServerObject(serverStatuses);
 							sendToServer("SCHD " + j.jobId + " " + serverToScheduleJob);
-							readFromServer(); //OK
-							sendToServer("REDY");
-						}
-/*
-						case "JOBP": {
-							Job j = new Job(serverMessageArray);
-							sendToServer("GETS Avail " + j.GET());
-							readFromServer();// DATA
-							int numLines = Integer.parseInt(serverMessage.split(" ")[1]);
-							sendToServer("OK");
-							ArrayList<String> serverStatuses = readMultiLineFromServer(numLines); // this
-							sendToServer("OK");
-							readFromServer(); // .
-
-							assert serverStatuses != null;
-							String serverToScheduleJob = getFirstLargestServerObject(serverStatuses);
-							sendToServer("SCHD " + j.jobId + " " + serverToScheduleJob);
-							readFromServer(); //OK
-							sendToServer("REDY");
+							break;
 						}
 
-						case "JCPL": {
-							sendToServer("REDY");
-							readFromServer();
-						}
+						case "JCPL":
 
 						case "OK": {
 							sendToServer("REDY");
-							readFromServer();
+							break;
 						}
 
- */
 						default:
+							break;
 					}
 				}
-				quit();
-			}
-			// end implementation
 
-			// String[] serverMessageArray = serverMessage.split(" ");
-
-			// Job j = null;
-
-			// if(serverMessageArray[0].equals("JOBN"))
-			// {
-			// j = new Job(serverMessageArray);
-			// sendToServer("GETS Capable "+j.GET());
-			// }
-			// readFromServer(); // DATA n
-			// int numLines = Integer.parseInt(serverMessage.split(" ")[1]);
-
-			// sendToServer("OK");
-			// ArrayList<String> serverStatuses = readMultiLineFromServer(numLines); // this
-			// will contain info of all server statuses //need to have a specific read
-			// because of multiline
-
-			// sendToServer("OK");
-			// readFromServer(); // .
-
-			// //this is where we should send schedule
-			// assert serverStatuses != null;
-			// String serverToScheduleJob = getFirstLargestServerObject(serverStatuses);
-			// sendToServer("SCHD "+j.jobId+" "+serverToScheduleJob);
-			// readFromServer();
-
-			// //step 4 is done here.
-			// while(!receivedNone)
-			// {
-			// //step 5
-			// sendToServer("REDY");
-
-			// //step 6
-			// readFromServer(); //might get JOBN, JOBP, ... NONE
-
-			// String[] serverMessageArray2 = serverMessage.split(" ");
-			// switch (serverMessageArray2[0]){
-			// case "JOBN":{ //array.length is guaranteed to be 7
-			// sendToServer("GETS Capable "+serverMessageArray2[4]
-			// +" "+serverMessageArray2[5] +" "+serverMessageArray2[6]);
-			// }
-			// case "JOBP":{//When the jon fail send JOBP, so that we can schedule that job
-			// again
-
-			// }
-
-			// case "DATA":{
-			// sendToServer("OK");
-			// }
-			// default:
-			// break;
-			// }
-			// }
-
-			// this line is reached when NONE has been received
-			// quit();
-
-			// String[] splitedJob = serverMessage.split("\\s+");
-			// for (String i : splitedJob) {
-			// System.out.println(i);
-			// }
-			// Jobs jobs = new Jobs(Integer.parseInt(splitedJob[0]),
-			// Integer.parseInt(splitedJob[1]),Integer.parseInt(splitedJob[2]),
-			// Integer.parseInt(splitedJob[3]),
-			// Integer.parseInt(splitedJob[4]),Integer.parseInt(splitedJob[5]));
-			// System.out.println(splited);
-			// Receiving Largest Server
-
-			// sendToServer("REDY");
-
-			s.close();
+			quit();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -307,8 +203,8 @@ public class Client {
 		// assuming the arraylist servers have been initialised
 		// serverState is sent as 1 message in page 15 of ds-sim-user-guide
 
-		// note that, while there might be unavailable servers, the client does not have
-		// to handle
+		// note that, while there might be unavailable servers,
+		// the client does not have to handle
 		// "scheduling to only available/booting.." servers.
 		// in later implementations, we could improve on this
 
@@ -332,7 +228,7 @@ public class Client {
 			System.out.println("Running without arguments");
 		}
 
-		else if (argument.length == 1 ){
+		else if (argument.length == 1 || argument.length > 2){
 			System.out.println("Invalid argument length");
 		}
 
