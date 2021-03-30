@@ -17,9 +17,10 @@ public class Client {
 	public ArrayList<ServerObject> servers = null;
 	public ServerObject largestServerObject = null;
 	public String serverMessage = null;
-	public String clientMessage = null; // why is this needed?
 	public Boolean receivedNone = null;
 
+
+	//we create the client constructor to run all the job dispatcher
 	public Client(String localAddress, int port) {
 
 		try {
@@ -77,7 +78,7 @@ public class Client {
 			System.out.println(e);
 		}
 	}
-
+	//method to read from server
 	public void readFromServer() {
 		try {
 			// refactor so that this.serverMessage is assigned from input.readLine
@@ -91,6 +92,7 @@ public class Client {
 	}
 
 	// main method to do all the client handling
+	//Step 1 to Step 3 in the user-guide to initiate the connection
 
 	public void handShake() {
 		sendToServer("HELO");
@@ -104,6 +106,7 @@ public class Client {
 		this.receivedNone = false;
 	}
 
+	//function to send to server to quit
 	public void quit() throws IOException {
 		sendToServer("QUIT");
 		readFromServer();
@@ -114,26 +117,28 @@ public class Client {
 		}
 	}
 
-	public void start(String[] args) {
+	public void jobSchedule() {
 		try {
-			handShake();
-			// Reading XML from server, get largest server, set to client's instance variables
-			this.initialiseServer(args);
-
+			
+			//Sending the first REDY to get the first job
 			sendToServer("REDY"); // step 5
 
 				String[] serverMessageArray = null;
 				int loopIter = 0;
+
+				//As long as we dont recieve NONE from the server, we keep on sending REDY to to more job
+				//and fo more scheduling and we check the NONE keyword in the readFromServer method
 				while (!receivedNone) {
-					System.out.println("inside loop: " + loopIter++);
+					// System.out.println("inside loop: " + loopIter++);
 					readFromServer();
+					//serverMessageArray is the message we get from the server and split it to schedule the job
 					serverMessageArray = serverMessage.split(" ");
 					switch (serverMessageArray[0]) {
 						case ("JOBN"): // merge with case JOBP
 						case "JOBP": {
 							Job j = new Job(serverMessageArray);
 							sendToServer("GETS Avail " + j.GET());
-							readFromServer();// DATA
+							readFromServer();//this message from server should be DATA
 							int numLines = Integer.parseInt(serverMessage.split(" ")[1]);
 							sendToServer("OK");
 							ArrayList<String> serverStatuses = readMultiLineFromServer(numLines); // multiple server states
@@ -141,11 +146,13 @@ public class Client {
 							readFromServer(); // .
 
 							assert serverStatuses != null;
+							//getting the largest server accrording to the data sent from server
 							String serverToScheduleJob = getFirstLargestServerObject(serverStatuses);
+							//SCHD the job
 							sendToServer("SCHD " + j.jobId + " " + serverToScheduleJob);
 							break;
 						}
-
+						//when server send a job complete message we send a REDY to get another job
 						case "JCPL":
 
 						case "OK": {
@@ -166,6 +173,7 @@ public class Client {
 
 	}
 
+	//function to read multiples servers from the server message
 	private ArrayList<String> readMultiLineFromServer(int numLines) {
 		try {
 			ArrayList<String> lines = new ArrayList<String>();
@@ -183,12 +191,12 @@ public class Client {
 		}
 	}
 
-	public void initialiseServer(String[] args) {
+	//method to read XML from server and find the largest server
+	public void initialiseServer() {
 		servers = readXML();
 		largestServerObject = getLargestServer();
-		boolean validArg = this.checkArgs(args); // DO SOME ARGUMENT CHECKING
 	}
-
+	//method to get the largest server
 	public ServerObject getLargestServer() {
 		ServerObject max = servers.get(0);
 		for (ServerObject s : servers) {
@@ -219,6 +227,9 @@ public class Client {
 		return largestType + " " + id; // something like "super-silk 0"
 	}
 
+
+	//method to check for an arguement 
+	//implementation for stage 2
 	public boolean checkArgs(String[] argument) {
 		boolean flag = false;
 		List validArgs = Arrays.asList("bf", "wf", "ff");
@@ -248,9 +259,12 @@ public class Client {
 		return flag;
 	}
 
+	//the main function to run all these method to create all the scheduling
 	public static void main(String[] args) {
 		Client client = new Client("127.0.0.1", 50000);
-		client.start(args);
-		System.out.println("Hello world");
+		client.checkArgs(args);
+		client.handShake();
+		client.initialiseServer();
+		client.jobSchedule();
 	}
 }
