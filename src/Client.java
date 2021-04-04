@@ -42,7 +42,7 @@ public class Client {
 	public ArrayList<ServerObject> readXML() {
 		ArrayList<ServerObject> serversList = new ArrayList<ServerObject>();
 		try {
-			File systemXML = new File("pre-compiled/ds-system.xml");
+			File systemXML = new File("ds-system.xml");
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = dBuilder.parse(systemXML);
