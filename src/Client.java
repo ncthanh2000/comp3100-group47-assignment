@@ -10,7 +10,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class Client {
-
 	public Socket s = null;
 	public BufferedReader input = null;
 	public DataOutputStream output = null;
@@ -19,26 +18,18 @@ public class Client {
 	public String serverMessage = null;
 	public Boolean receivedNone = null;
 
-
-	//we create the client constructor to run all the job dispatcher
 	public Client(String localAddress, int port) {
-
 		try {
 			s = new Socket(localAddress, port);
 			input = new BufferedReader(new InputStreamReader(s.getInputStream()));
 			output = new DataOutputStream(s.getOutputStream());
-		} catch (UnknownHostException e) {
-			System.out.println(e);
-			e.printStackTrace();
 		} catch (IOException e) {
 			System.out.println(e);
 			e.printStackTrace();
 		}
-
 	}
 
-	// function to read xml file server in the ds-server and return the server
-	// arraylist
+	// function to read xml file server in the ds-server and return the server arraylist
 	public ArrayList<ServerObject> readXML() {
 		ArrayList<ServerObject> serversList = new ArrayList<ServerObject>();
 		try {
@@ -60,7 +51,6 @@ public class Client {
 				int disk = Integer.parseInt(server.getAttribute("disk"));
 
 				ServerObject serv = new ServerObject(type, limit, bootUpTime, hourlyRate, coreCount, memory, disk);
-				// Add all this server we read from xml files to a server class that we created
 				serversList.add(serv);
 			}
 		} catch (Exception ex) {
@@ -91,88 +81,6 @@ public class Client {
 		}
 	}
 
-	// main method to do all the client handling
-	//Step 1 to Step 3 in the user-guide to initiate the connection
-
-	public void handShake() {
-		sendToServer("HELO");
-		readFromServer(); // OK
-
-		String username = System.getProperty("user.name");
-		String authMessage = "AUTH " + username;
-		sendToServer(authMessage);
-		readFromServer();// OK
-
-		this.receivedNone = false;
-	}
-
-	//function to send to server to quit
-	public void quit() throws IOException {
-		sendToServer("QUIT");
-		readFromServer();
-		if (serverMessage.equals("QUIT")) {
-			input.close();
-			output.close();
-			s.close();
-		}
-	}
-
-	public void jobSchedule() {
-		try {
-			
-			//Sending the first REDY to get the first job
-			sendToServer("REDY"); // step 5
-
-				String[] serverMessageArray = null;
-				int loopIter = 0;
-
-				//As long as we dont recieve NONE from the server, we keep on sending REDY to to more job
-				//and fo more scheduling and we check the NONE keyword in the readFromServer method
-				while (!receivedNone) {
-					// System.out.println("inside loop: " + loopIter++);
-					readFromServer();
-					//serverMessageArray is the message we get from the server and split it to schedule the job
-					serverMessageArray = serverMessage.split(" ");
-					switch (serverMessageArray[0]) {
-						case ("JOBN"): // merge with case JOBP
-						case "JOBP": {
-							Job j = new Job(serverMessageArray);
-							sendToServer("GETS Avail " + j.GET());
-							readFromServer();//this message from server should be DATA
-							int numLines = Integer.parseInt(serverMessage.split(" ")[1]);
-							sendToServer("OK");
-							ArrayList<String> serverStatuses = readMultiLineFromServer(numLines); // multiple server states
-							sendToServer("OK");
-							readFromServer(); // .
-
-							assert serverStatuses != null;
-							//getting the largest server accrording to the data sent from server
-							String serverToScheduleJob = getFirstLargestServerObject(serverStatuses);
-							//SCHD the job
-							sendToServer("SCHD " + j.jobId + " " + serverToScheduleJob);
-							break;
-						}
-						//when server send a job complete message we send a REDY to get another job
-						case "JCPL":
-
-						case "OK": {
-							sendToServer("REDY");
-							break;
-						}
-
-						default:
-							break;
-					}
-				}
-
-			quit();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
 	//function to read multiples servers from the server message
 	private ArrayList<String> readMultiLineFromServer(int numLines) {
 		try {
@@ -191,7 +99,6 @@ public class Client {
 		}
 	}
 
-	//method to read XML from server and find the largest server
 	public void initialiseServer() {
 		servers = readXML();
 		largestServerObject = getLargestServer();
@@ -226,9 +133,8 @@ public class Client {
 		}
 		return largestType + " " + id; // something like "super-silk 0"
 	}
-
-
-	//method to check for an arguement 
+	//=====================================================================================
+	//method to check for an argument
 	//implementation for stage 2
 	public boolean checkArgs(String[] argument) {
 		boolean flag = false;
@@ -257,6 +163,85 @@ public class Client {
 			flag = true;
 		}
 		return flag;
+	}
+
+	// main method to do all the client handling
+	//Step 1 to Step 3 in the user-guide to initiate the connection
+	public void handShake() {
+		sendToServer("HELO");
+		readFromServer(); // OK
+
+		String username = System.getProperty("user.name");
+		String authMessage = "AUTH " + username;
+		sendToServer(authMessage);
+		readFromServer();// OK
+		this.receivedNone = false;
+	}
+
+	public void jobSchedule() {
+		try {
+			//Sending the first REDY to get the first job
+			sendToServer("REDY"); // step 5
+
+			String[] serverMessageArray = null;
+			int loopIter = 0;
+
+			//As long as we dont recieve NONE from the server, we keep on sending REDY to to more job
+			//and fo more scheduling and we check the NONE keyword in the readFromServer method
+			while (!receivedNone) {
+				// System.out.println("inside loop: " + loopIter++);
+				readFromServer();
+				//serverMessageArray is the message we get from the server and split it to schedule the job
+				serverMessageArray = serverMessage.split(" ");
+				switch (serverMessageArray[0]) {
+					case ("JOBN"): // merge with case JOBP
+					case "JOBP": {
+						Job j = new Job(serverMessageArray);
+						sendToServer("GETS Avail " + j.GET());
+						readFromServer();//this message from server should be DATA
+						int numLines = Integer.parseInt(serverMessage.split(" ")[1]);
+						sendToServer("OK");
+						ArrayList<String> serverStatuses = readMultiLineFromServer(numLines); // multiple server states
+						sendToServer("OK");
+						readFromServer(); // .
+
+						assert serverStatuses != null;
+						//getting the largest server accrording to the data sent from server
+						String serverToScheduleJob = getFirstLargestServerObject(serverStatuses);
+						//SCHD the job
+						sendToServer("SCHD " + j.jobId + " " + serverToScheduleJob);
+						break;
+					}
+					//when server send a job complete message we send a REDY to get another job
+					case "JCPL":
+
+					case "OK": {
+						sendToServer("REDY");
+						break;
+					}
+
+					default:
+						break;
+				}
+			}
+
+			quit();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	//function to send to server to quit
+	public void quit() throws IOException {
+		sendToServer("QUIT");
+		readFromServer();
+		if (serverMessage.equals("QUIT")) {
+			input.close();
+			output.close();
+			s.close();
+		}
 	}
 
 	//the main function to run all these method to create all the scheduling
