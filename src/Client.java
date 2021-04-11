@@ -74,7 +74,7 @@ public class Client {
 			// refactor so that this.serverMessage is assigned from input.readLine
 			serverMessage = input.readLine();
 			receivedNone = serverMessage.equals("NONE");
-			System.out.println("server: " + serverMessage + "\n");
+			//System.out.println("server: " + serverMessage + "\n");
 		} catch (IOException e) {
 			serverMessage = "Error";
 			System.out.println(e);
@@ -90,7 +90,7 @@ public class Client {
 				lines.add(serverMessage);
 				receivedNone = serverMessage.equals("NONE");
 			}
-			System.out.println("server: "+lines.toString()+"\n");
+			//System.out.println("server: "+lines.toString()+"\n");
 			return lines;
 		} catch (IOException e) {
 			serverMessage = "Error";
