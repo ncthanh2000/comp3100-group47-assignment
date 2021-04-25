@@ -4,6 +4,6 @@ public interface SchedulingAlgo {
     // some methods that are common with scheduling algo
     //take an input list of servers, and return another list of servers
     // that meet a certain condition depending on the algorithm
-    public ArrayList<ServerObject> chooseServerType(ArrayList<ServerObject> servers);
-
+    public void setServers(ArrayList<ServerObject> s);
+    public String getSCHDServer(ArrayList<String> serverStatuses, Job j);
 }

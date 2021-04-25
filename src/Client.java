@@ -14,9 +14,9 @@ public class Client {
 	public BufferedReader input = null;
 	public DataOutputStream output = null;
 	public ArrayList<ServerObject> servers = null;
-	public ServerObject largestServerObject = null;
 	public String serverMessage = null;
 	public Boolean receivedNone = null;
+	public SchedulingAlgo algorithm= null;
 
 	public Client(String localAddress, int port) {
 		try {
@@ -101,48 +101,21 @@ public class Client {
 
 	public void initialiseServer() {
 		servers = readXML();
-		largestServerObject = getLargestServer();
-	}
-	//method to get the largest server
-	public ServerObject getLargestServer() {
-		ServerObject max = servers.get(0);
-		for (ServerObject s : servers) {
-			if (max.compareTo(s) < 0) {
-				max = s;
-			}
-		}
-		return new ServerObject(max);
+		algorithm.setServers(servers);
 	}
 
-	public String getFirstLargestServerObject(ArrayList<String> serverStatuses) {
-		// assuming the arraylist servers have been initialised
-		// serverState is sent as 1 message in page 15 of ds-sim-user-guide
 
-		// note that, while there might be unavailable servers,
-		// the client does not have to handle
-		// "scheduling to only available/booting.." servers.
-		// in later implementations, we could improve on this
-
-		String largestType = getLargestServer().type;
-		int id = 0;
-		for (String s : serverStatuses) {
-			String[] splitted = s.split(" ");
-			if (splitted[0].equals(largestType)) {
-				id = Math.min(Integer.parseInt(splitted[1]), id);
-			}
-		}
-		return largestType + " " + id; // something like "super-silk 0"
-	}
 	//=====================================================================================
 	//method to check for an argument
 	//implementation for stage 2
-	public boolean checkArgs(String[] argument) {
+	public void checkArgs(String[] argument) {
 		boolean flag = false;
 		List validArgs = Arrays.asList("bf", "wf", "ff");
 
 		if(argument.length == 0)
 		{
 			System.out.println("Running without arguments");
+			algorithm = new AllToLargest();
 		}
 
 		else if (argument.length == 1 || argument.length > 2){
@@ -159,10 +132,14 @@ public class Client {
 		}
 
 		else {
-			System.out.println("Successful client call");
-			flag = true;
+			System.out.println("Successful supplied algorithm");
+			switch (argument[1]) {
+				case "bf" : algorithm = new BestFit(); break;
+				case "wf":algorithm = new WorstFit();break;
+				case "ff":algorithm = new FirstFit();break;
+				default:System.out.println("Uncaught error");break;
+			}
 		}
-		return flag;
 	}
 
 	// main method to do all the client handling
@@ -183,7 +160,7 @@ public class Client {
 			//Sending the first REDY to get the first job
 			sendToServer("REDY"); // step 5
 
-			String[] serverMessageArray = null;
+			String[] serverMessageArray;
 			int loopIter = 0;
 
 			//As long as we dont recieve NONE from the server, we keep on sending REDY to to more job
@@ -206,8 +183,8 @@ public class Client {
 						readFromServer(); // .
 
 						assert serverStatuses != null;
-						//getting the largest server accrording to the data sent from server
-						String serverToScheduleJob = getFirstLargestServerObject(serverStatuses);
+						//getting the largest server according to the data sent from server
+						String serverToScheduleJob = algorithm.getSCHDServer(serverStatuses, j);
 						//SCHD the job
 						sendToServer("SCHD " + j.jobId + " " + serverToScheduleJob);
 						break;
