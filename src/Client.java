@@ -110,7 +110,7 @@ public class Client {
 	//implementation for stage 2
 	public void checkArgs(String[] argument) {
 		boolean flag = false;
-		List validArgs = Arrays.asList("bf", "wf", "ff");
+		List validArgs = Arrays.asList("bf", "wf", "mt");
 
 		if(argument.length == 0)
 		{
@@ -136,7 +136,7 @@ public class Client {
 			switch (argument[1]) {
 				case "bf" : algorithm = new BestFit(); break;
 				case "wf":algorithm = new WorstFit();break;
-				case "ff":algorithm = new FirstFit();break;
+				case "mt":algorithm = new MinTurnAround();break;
 				default:System.out.println("Uncaught error");break;
 			}
 		}
@@ -174,14 +174,14 @@ public class Client {
 					case ("JOBN"): // merge with case JOBP
 					case "JOBP": {
 						Job j = new Job(serverMessageArray);
-						sendToServer("GETS Avail " + j.GET());
+						sendToServer("GETS Capable " + j.GET());
 						readFromServer();//this message from server should be DATA
 						int numLines = Integer.parseInt(serverMessage.split(" ")[1]);
 						sendToServer("OK");
 						ArrayList<String> serverStatuses = readMultiLineFromServer(numLines); // multiple server states
 						sendToServer("OK");
 						readFromServer(); // .
-
+						System.out.println(serverStatuses + "Server Status\n\n");
 						assert serverStatuses != null;
 						//getting the largest server according to the data sent from server
 						String serverToScheduleJob = algorithm.getSCHDServer(serverStatuses, j);
