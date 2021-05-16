@@ -15,7 +15,7 @@ public class AllToLargest implements SchedulingAlgo{
     }
 
     @Override
-    public String getSCHDServer(ArrayList<String> serverStatuses, Job j) {
+    public ServerObject getSCHDServer() {
         // assuming the arraylist servers have been initialised
         // serverState is sent as 1 message in page 15 of ds-sim-user-guide
 
@@ -24,18 +24,24 @@ public class AllToLargest implements SchedulingAlgo{
         // "scheduling to only available/booting.." servers.
         // in later implementations, we could improve on this
 
-        String largestType = getLargestServer().type;
-        int id = 0;
-        for (String s : serverStatuses) {
-            String[] splitted = s.split(" ");
-            if (splitted[0].equals(largestType)) {
-                id = Math.min(Integer.parseInt(splitted[1]), id);
-            }
-        }
-        return largestType + " " + id; // something like "super-silk 0"
+//        String largestType = getLargestServer().type;
+//        int id = 0;
+//        for (String s : serverStatuses) {
+//            String[] splitted = s.split(" ");
+//            if (splitted[0].equals(largestType)) {
+//                id = Math.min(Integer.parseInt(splitted[1]), id);
+//            }
+//        }
+//        return largestType + " " + id; // something like "super-silk 0"
+        return null;
     }
 
     public void setServers(ArrayList<ServerObject> s){
         this.servers = s;
+    }
+
+    @Override
+    public void populateServers(ArrayList<String> serverStatuses) {
+
     }
 }

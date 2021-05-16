@@ -36,6 +36,11 @@ public class ServerObject {
         this.disk = Integer.parseInt(disk);
     }
 
+    public ServerObject(String[] singleServerStatus){
+        this(singleServerStatus[0],singleServerStatus[1],singleServerStatus[2],singleServerStatus[3],
+                singleServerStatus[4],singleServerStatus[5],singleServerStatus[6]);
+    }
+
     public String toString(){
         return type+", "+limit+", "+bootupTime+", "+hourlyRate+", "+coreCount+", "+memory+", "+disk;
     }

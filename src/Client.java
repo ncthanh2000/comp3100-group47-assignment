@@ -110,7 +110,8 @@ public class Client {
 	//implementation for stage 2
 	public void checkArgs(String[] argument) {
 		boolean flag = false;
-		List validArgs = Arrays.asList("bf", "wf", "mt");
+		// min cost, max utlise, min turnaround
+		List validArgs = Arrays.asList("minc", "maxu", "mint");
 
 		if(argument.length == 0)
 		{
@@ -134,9 +135,7 @@ public class Client {
 		else {
 			System.out.println("Successful supplied algorithm");
 			switch (argument[1]) {
-				case "bf" : algorithm = new BestFit(); break;
-				case "wf":algorithm = new WorstFit();break;
-				case "mt":algorithm = new MinTurnAround();break;
+				case "mint":algorithm = new MinTurnAround();break;
 				default:System.out.println("Uncaught error");break;
 			}
 		}
@@ -183,10 +182,10 @@ public class Client {
 						readFromServer(); // .
 						System.out.println(serverStatuses + "Server Status\n\n");
 						assert serverStatuses != null;
-						//getting the largest server according to the data sent from server
-						String serverToScheduleJob = algorithm.getSCHDServer(serverStatuses, j);
+						algorithm.populateServers(serverStatuses);
+						ServerObject serverToScheduleJob = algorithm.getSCHDServer();
 						//SCHD the job
-						sendToServer("SCHD " + j.jobId + " " + serverToScheduleJob);
+						sendToServer("SCHD " + j.jobId + " " + serverToScheduleJob.type +" "+ serverToScheduleJob.id);
 						break;
 					}
 					//when server send a job complete message we send a REDY to get another job
