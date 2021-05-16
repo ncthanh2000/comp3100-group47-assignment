@@ -1,0 +1,8 @@
+./AllToLargest.java
+./BestFit.java
+./Client.java
+./Job.java
+./MinTurnAround.java
+./SchedulingAlgo.java
+./ServerObject.java
+./WorstFit.java
