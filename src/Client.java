@@ -180,7 +180,7 @@ public class Client {
 						ArrayList<String> serverStatuses = readMultiLineFromServer(numLines); // multiple server states
 						sendToServer("OK");
 						readFromServer(); // .
-						System.out.println(serverStatuses + "Server Status\n\n");
+						System.out.println(serverStatuses + "Server Status\n");
 						assert serverStatuses != null;
 						algorithm.populateServers(serverStatuses);
 						ServerObject serverToScheduleJob = algorithm.getSCHDServer();

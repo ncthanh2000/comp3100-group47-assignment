@@ -1,0 +1,166 @@
+# ds-sim server 18-February, 2021 @ MQ - client-server
+# Server-side simulator started with './ds-server -v all -c ./configs/sample-configs/2-jobs.xml -i'
+# Waiting for connection to port 50000 of IP address 127.0.0.1
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > HELO
+OK
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > AUTH Socheat
+# Welcome  Socheat!
+# The system information can be read from 'ds-system.xml'
+OK
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > REDY
+JOBN 37 0 653 3 700 3800
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > GETS Avail 3 700 3800
+DATA 3 124
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > OK
+joon 0 inactive -1 4 16000 64000 0 0
+joon 1 inactive -1 4 16000 64000 0 0
+super-silk 0 inactive -1 16 64000 512000 0 0
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > SCHD 0 super-silk 0
+The message is supposed to be "OK", but received "SCHD 0 super-silk 0"
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > OK
+.
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > SCHD 0 super-silk 0
+t:         37 job     0 (waiting) on # 0 of server super-silk (booting) SCHEDULED
+OK
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > REDY
+JOBN 60 1 2025 2 1500 2900
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > GETS Avail 2 1500 2900
+DATA 4 124
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > OK
+juju 0 inactive -1 2 4000 16000 0 0
+juju 1 inactive -1 2 4000 16000 0 0
+joon 0 inactive -1 4 16000 64000 0 0
+joon 1 inactive -1 4 16000 64000 0 0
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > SCHD 1 joon 1
+The message is supposed to be "OK", but received "SCHD 1 joon 1"
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > OK
+.
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > SCHD 1 joon 0
+t:         60 job     1 (waiting) on # 0 of server joon (booting) SCHEDULED
+OK
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > REDY
+t:        117 job     0 on # 0 of server super-silk RUNNING
+t:        120 job     1 on # 0 of server joon RUNNING
+t:       1215 job     1 on # 0 of server joon COMPLETED
+JCPL 1215 1 joon 0
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > OK
+JCPL 1215 1 joon 0
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > REDY
+t:       1357 job     0 on # 0 of server super-silk COMPLETED
+JCPL 1357 0 super-silk 0
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > OK
+JCPL 1357 0 super-silk 0
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > REDY
+NONE
+
+# -------------------------------------------------------------------------------------
+# 0 juju servers used with a utilisation of 0.00 at the cost of $0.00
+# 1 joon servers used with a utilisation of 100.00 at the cost of $0.12
+# 1 super-silk servers used with a utilisation of 100.00 at the cost of $0.28
+# ==================================== [ Summary ] ====================================
+# actual simulation end time: 1357, #jobs: 2 (failed 0 times)
+# total #servers used: 2, avg util: 100.00% (ef. usage: 100.00%), total cost: $0.40
+# avg waiting time: 70, avg exec time: 1167, avg turnaround time: 1237
+
+
+
+
+
+
+
+
+# ds-sim server 18-February, 2021 @ MQ - client-server
+# Server-side simulator started with './ds-server -v all -c ./configs/sample-configs/2-jobs.xml -i'
+# Waiting for connection to port 50000 of IP address 127.0.0.1
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > HELO
+OK
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > AUTH Socheat
+# Welcome  Socheat!
+# The system information can be read from 'ds-system.xml'
+OK
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > RDY
+No such command!
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > REDY
+JOBN 37 0 653 3 700 3800
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > GETS Capable 3 700 3800
+DATA 3 124
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > OK
+joon 0 inactive -1 4 16000 64000 0 0
+joon 1 inactive -1 4 16000 64000 0 0
+super-silk 0 inactive -1 16 64000 512000 0 0
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > OK          
+.
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > SCHD 0 super-silk 0
+t:         37 job     0 (waiting) on # 0 of server super-silk (booting) SCHEDULED
+OK
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > REDY
+JOBN 60 1 2025 2 1500 2900
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > GETS Capable 2 1500 2900
+DATA 5 124
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > OK
+juju 0 inactive -1 2 4000 16000 0 0
+juju 1 inactive -1 2 4000 16000 0 0
+joon 0 inactive -1 4 16000 64000 0 0
+joon 1 inactive -1 4 16000 64000 0 0
+super-silk 0 booting 117 13 63300 508200 1 0
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > OK
+.
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > SCHD 1 super-silk 0
+t:         60 job     1 (waiting) on # 0 of server super-silk (booting) SCHEDULED
+OK
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > REDY
+t:        117 job     0 on # 0 of server super-silk RUNNING
+t:        117 job     1 on # 0 of server super-silk RUNNING
+t:       1212 job     1 on # 0 of server super-silk COMPLETED
+JCPL 1212 1 super-silk 0
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > REDY
+t:       1357 job     0 on # 0 of server super-silk COMPLETED
+JCPL 1357 0 super-silk 0
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > REDY
+NONE
+
+# next event|print server_type [server_id]|repeat prev cmd|ds-sim cmd|quit > QUIT
+QUIT
+# -------------------------------------------------------------------------------------
+# 0 juju servers used with a utilisation of 0.00 at the cost of $0.00
+# 0 joon servers used with a utilisation of 0.00 at the cost of $0.00
+# 1 super-silk servers used with a utilisation of 100.00 at the cost of $0.28
+# ==================================== [ Summary ] ====================================
+# actual simulation end time: 1357, #jobs: 2 (failed 0 times)
+# total #servers used: 1, avg util: 100.00% (ef. usage: 100.00%), total cost: $0.28
+# avg waiting time: 68, avg exec time: 1167, avg turnaround time: 1235
