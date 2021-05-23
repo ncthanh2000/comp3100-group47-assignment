@@ -30,34 +30,7 @@ public class Client {
 	}
 
 	// function to read xml file server in the ds-server and return the server arraylist
-	public ArrayList<ServerObject> readXML() {
-		ArrayList<ServerObject> serversList = new ArrayList<ServerObject>();
-		try {
-			File systemXML = new File("ds-system.xml");
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(systemXML);
 
-			doc.getDocumentElement().normalize();
-			NodeList servers = doc.getElementsByTagName("server");
-			for (int i = 0; i < servers.getLength(); i++) {
-				Element server = (Element) servers.item(i);
-				String type = server.getAttribute("type");
-				int limit = Integer.parseInt(server.getAttribute("limit"));
-				int bootUpTime = Integer.parseInt(server.getAttribute("bootupTime"));
-				double hourlyRate = Double.parseDouble(server.getAttribute("hourlyRate"));
-				int coreCount = Integer.parseInt(server.getAttribute("coreCount"));
-				int memory = Integer.parseInt(server.getAttribute("memory"));
-				int disk = Integer.parseInt(server.getAttribute("disk"));
-
-				ServerObject serv = new ServerObject(type, limit, bootUpTime, hourlyRate, coreCount, memory, disk);
-				serversList.add(serv);
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return serversList;
-	}
 
 	// method to send to the server
 	public void sendToServer(String message) {
@@ -98,12 +71,6 @@ public class Client {
 			return null;
 		}
 	}
-
-	public void initialiseServer() {
-		servers = readXML();
-		algorithm.setServers(servers);
-	}
-
 
 	//=====================================================================================
 	//method to check for an argument
@@ -162,7 +129,7 @@ public class Client {
 			String[] serverMessageArray;
 			int loopIter = 0;
 
-			//As long as we dont recieve NONE from the server, we keep on sending REDY to to more job
+			//As long as we dont receive NONE from the server, we keep on sending REDY to to more job
 			//and fo more scheduling and we check the NONE keyword in the readFromServer method
 			while (!receivedNone) {
 				// System.out.println("inside loop: " + loopIter++);
@@ -225,7 +192,6 @@ public class Client {
 		Client client = new Client("127.0.0.1", 50000);
 		client.checkArgs(args);
 		client.handShake();
-		client.initialiseServer();
 		client.jobSchedule();
 	}
 }
