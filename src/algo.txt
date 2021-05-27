@@ -1,0 +1,56 @@
+Algorithm:
+
+Minimum Cost:
+Use GETS Capable to get all the machines that will eventually be capable.
+SCHD on the "weakest" machine out of the CAPABLE. As more job are scheduled on that server, its core/disk/mem will be reduced in each subsequent GETS Capable's response. Keep Scheduling on that server.
+For example,if we have 20 tiny server(10 core), 20 medium server(20 core), 20 large server(30 core), and we have 3 different tiers of jobs (5 core, 15 core, 25 core).
+
+Say that, for the first job of each tier, we place it on the first-id of the same server type.
+That is, if we first receive a 5-core job, we schedule it on tiny-0, which now only has 5 core. Next time around, after we again receive a 5-core job, when we do GETS Capable, tiny-0 will only have 15 cores. We then keep scheduling on it, even if it has 0 cores.
+
+By doing this, we ensure that, all jobs of the same tier (core count) is guaranteed to be scheduled on the SAME server (all 5-core goes to tiny-0, all 15-core goes to medium-0, all 25-core goes to large-0). This ensures minimum amount of server used, hence, we can cut down on cost
+
+
+need to read from XML rather than [Data n] to know original core count for a type:
+that is, super-silk 0 vs joon 0 (even when gets capable return 0 core for both types, in the case where all cores are currently being used)
+
+
+
+Minimum Time:
+Always schedule on the MOST CURRENT CAPABLE server (GETS CAPABLE, ):
+
+prioritisation order: active/booting -> idle -> inactive (do not schedule on avaiable)
+
+
+First, send GETS Capable for Job j
+Populate algorithm.servers
+Initialise Job j
+active_booting = ArrayList of all active/booting servers
+idle_servers = ArrayList of all idle servers
+inactive_servers = ArrayList of all Inactive servers
+
+if active_booting is not empty:
+	largest = server with highest core
+	if largest.core >= j.core:
+			schedule on largest
+	else:
+		dont do anything, as this means no idle server has Current Capable cores
+
+else if idle is not empty:
+	largest = server with highest core
+	if largest.core >= j.core:
+			schedule on largest
+	else:
+		dont do anything, as this means no idle server has Current Capable cores
+
+else if inactive is not empty:
+	largest = server with highest core
+	if largest.core >= j.core:
+			schedule on largest
+	else:
+		dont do anything, as this means no inactive server has Current Capable cores
+
+else: // here means no active_booting/idle/inactive servers can run:
+	// throw error (most likely not gonna get this, so you can just not do anything)
+
+This minimises time, because we are scheduling on servers that are already running, with spare cores (so the scheduled job are run immediately upon being scheduled.)

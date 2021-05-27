@@ -13,6 +13,7 @@ public class Client {
 	public Socket s = null;
 	public BufferedReader input = null;
 	public DataOutputStream output = null;
+	public Map<String, Integer> servertypeCoreDictionary;
 	public ArrayList<ServerObject> servers = null;
 	public String serverMessage = null;
 	public Boolean receivedNone = null;
@@ -30,7 +31,28 @@ public class Client {
 	}
 
 	// function to read xml file server in the ds-server and return the server arraylist
+	public void readXML() {
+		servertypeCoreDictionary = new HashMap<String, Integer>();
+		try {
+			File systemXML = new File("ds-system.xml");
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(systemXML);
 
+			doc.getDocumentElement().normalize();
+			NodeList servers = doc.getElementsByTagName("server");
+			for (int i = 0; i < servers.getLength(); i++) {
+				Element server = (Element) servers.item(i);
+				String type = server.getAttribute("type");
+				int coreCount = Integer.parseInt(server.getAttribute("coreCount"));
+				if(!servertypeCoreDictionary.containsKey(type)){
+					servertypeCoreDictionary.put(type, coreCount);
+				}
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
 
 	// method to send to the server
 	public void sendToServer(String message) {
@@ -72,6 +94,8 @@ public class Client {
 		}
 	}
 
+
+
 	//=====================================================================================
 	//method to check for an argument
 	//implementation for stage 2
@@ -102,7 +126,7 @@ public class Client {
 		else {
 			System.out.println("Successful supplied algorithm");
 			switch (argument[1]) {
-				case "mint":algorithm = new MinTurnAround();break;
+				case "minc":algorithm = new MinCost();break;
 				default:System.out.println("Uncaught error");break;
 			}
 		}
@@ -129,7 +153,7 @@ public class Client {
 			String[] serverMessageArray;
 			int loopIter = 0;
 
-			//As long as we dont receive NONE from the server, we keep on sending REDY to to more job
+			//As long as we dont recieve NONE from the server, we keep on sending REDY to to more job
 			//and fo more scheduling and we check the NONE keyword in the readFromServer method
 			while (!receivedNone) {
 				// System.out.println("inside loop: " + loopIter++);
@@ -147,9 +171,10 @@ public class Client {
 						ArrayList<String> serverStatuses = readMultiLineFromServer(numLines); // multiple server states
 						sendToServer("OK");
 						readFromServer(); // .
-						System.out.println(serverStatuses + "Server Status\n");
+						System.out.println(serverStatuses + "Server Status\n\n");
 						assert serverStatuses != null;
 						algorithm.populateServers(serverStatuses);
+						algorithm.setTypeCorecountDictionary(this.servertypeCoreDictionary);
 						ServerObject serverToScheduleJob = algorithm.getSCHDServer();
 						//SCHD the job
 						sendToServer("SCHD " + j.jobId + " " + serverToScheduleJob.type +" "+ serverToScheduleJob.id);
@@ -192,6 +217,7 @@ public class Client {
 		Client client = new Client("127.0.0.1", 50000);
 		client.checkArgs(args);
 		client.handShake();
+		client.readXML();
 		client.jobSchedule();
 	}
 }

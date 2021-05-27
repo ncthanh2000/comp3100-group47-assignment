@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Map;
 
 public class MinTurnAround implements SchedulingAlgo {
     public ArrayList<ServerObject> servers;
@@ -27,5 +28,10 @@ public class MinTurnAround implements SchedulingAlgo {
     @Override
     public ServerObject getSCHDServer() {
         return this.getLargestServer(); // something like "super-silk 0"
+    }
+
+    @Override
+    public void setTypeCorecountDictionary(Map<String, Integer> servertypeCoreDictionary) {
+
     }
 }

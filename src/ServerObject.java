@@ -57,11 +57,7 @@ public class ServerObject {
 
 	public int compareTo(ServerObject other)
     {
-        // Comparison ordering: coreCount -> memory -> disk
-        int coreComp = Integer.compare(this.coreCount, other.coreCount);
-        int memoryComp = Integer.compare(this.memory, other.memory);
-        int diskComp = Integer.compare(this.disk, other.disk);
-
-        return coreComp!=0?coreComp: memoryComp!=0?memoryComp: diskComp;
+        // Comparison ordering: coreCount
+        return Integer.compare(this.coreCount, other.coreCount);
     }
 }

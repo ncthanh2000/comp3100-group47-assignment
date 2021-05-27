@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Map;
 
 public class AllToLargest implements SchedulingAlgo{
     public ArrayList<ServerObject> servers;
@@ -34,6 +35,11 @@ public class AllToLargest implements SchedulingAlgo{
 //        }
 //        return largestType + " " + id; // something like "super-silk 0"
         return null;
+    }
+
+    @Override
+    public void setTypeCorecountDictionary(Map<String, Integer> servertypeCoreDictionary) {
+
     }
 
     public void setServers(ArrayList<ServerObject> s){

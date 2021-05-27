@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Map;
 
 public interface SchedulingAlgo {
     // some methods that are common with scheduling algo
@@ -7,4 +8,6 @@ public interface SchedulingAlgo {
     public void setServers(ArrayList<ServerObject> s);
     public void populateServers(ArrayList<String> serverStatuses);
     public ServerObject getSCHDServer();
+
+    void setTypeCorecountDictionary(Map<String, Integer> servertypeCoreDictionary);
 }
